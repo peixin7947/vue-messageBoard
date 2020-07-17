@@ -1,0 +1,24 @@
+*{margin:0;padding:0;}
+html,body,#app,.wrapper{
+    width:100%;
+    height:100%;
+    overflow: hidden;
+}
+body{
+    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    /*background-color: lightcyan;*/
+    /*background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);*/
+}
+a{text-decoration: none}
+.content{
+    background: none repeat scroll 0 0 #fff;
+    position: absolute;
+    left: 180px;
+    right: 0;
+    top: 50px;
+    bottom:0;
+    width: auto;
+    padding:40px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
