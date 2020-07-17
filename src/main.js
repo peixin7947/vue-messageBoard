@@ -29,10 +29,10 @@ Vue.config.productionTip = false;
 Vue.prototype.$queryString = querystring;
 Vue.prototype.$toastr = toastr;
 Vue.prototype.$http = axios.create({
-  baseURL: 'http://10.32.4.166:7001',
+  baseURL: 'localhost:7001',
   timeout: 3000,
 });
-Vue.prototype.$url = 'http://10.32.4.166:7001';
+Vue.prototype.$url = 'localhost:7001';
 Vue.use(ElementUI);
 
 new Vue({
