@@ -63,9 +63,10 @@
                                 const result = res.data;
                                 if (result.code === 0) {
                                     this.$message.success(result.msg);
-                                    that.$router.push('/messageBoard');
                                     // 存储用户信息
-                                    sessionStorage.userInfo = result.data;
+                                    sessionStorage.setItem('userInfo', JSON.stringify(result.data));
+                                    // 跳转页面
+                                    that.$router.push('/messageBoard');
                                 } else {
                                     this.$message.error(result.msg);
                                 }

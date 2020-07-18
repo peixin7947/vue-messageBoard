@@ -1,45 +1,68 @@
 <template>
-    <div class="header">
-        <el-col :span="10" class="logo">留言板</el-col>
-        <el-col :span="10">
-            <div class="tools"><i id="sider-toggle" class="" data-toggle="collapse"
-                                  data-target="#siderbar"></i></div>
+    <el-row type="flex" align="top" justify="center" class="nav">
+        <el-col class="logo">
+            <h1>留言板</h1>
         </el-col>
-        <div class="user-info">
-            <el-dropdown trigger="click" @command="handleCommand">
-            <span class="el-dropdown-link">
-                <img class="user-logo" :src=userInfo.avatar>
-                {{userInfo}}
-            </span>
-                <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="loginout">退出</el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-        </div>
-    </div>
+        <el-col>
+            <el-menu :default-active="activeIndex" class="el-menu" mode="horizontal" @select="handleSelect">
+                <el-menu-item index="1" path="123">留言板</el-menu-item>
+                <el-menu-item index="2">管理留言</el-menu-item>
+                <el-submenu index="3" class="">
+                    <template slot="title">
+                        <el-avatar :size="50" :src="avatar"></el-avatar>
+                    </template>
+                    <el-menu-item index="3-1">个人信息</el-menu-item>
+                    <el-menu-item index="3-2">退出登录</el-menu-item>
+                </el-submenu>
+            </el-menu>
+        </el-col>
+    </el-row>
 </template>
 <script>
+    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
     export default {
         data() {
             return {
-                name: '',
-                sysName: '',
-                collapsed: false,
-                userInfo: sessionStorage.userInfo,
+                activeIndex: '1',
+                avatar: this.$url + userInfo.avatar,
             }
         },
+
         computed: {
-            userInfo() {
-                let userInfo = sessionStorage.userInfo;
-                return userInfo ? userInfo : null;
-            }
+            // username() {
+            //     let userInfo = sessionStorage.userInfo;
+            //     return userInfo ? userInfo : null;
+            // }
         },
         methods: {
-            handleCommand(command) {
-                if (command === 'loginout') {
-                    localStorage.removeItem('ms_username')
-                    this.$router.push('/login');
+            handleSelect(index) {
+                switch (index) {
+                    case "1":
+                        this.$router.push("/messageBoard").catch(() => {
+                        });
+                        break;
+                    case "2":
+                        this.$router.push('/managerMessage').catch(() => {
+                        });
+                        break;
+                    case "3-2":
+                        this.handleCommand();
+                        break;
+                    default:
                 }
+            },
+            handleCommand() {
+                // 清空用户信息
+                localStorage.removeItem('userInfo')
+                this.$http.post('/api/logout').then((res) => {
+                    const result = res.data;
+                    if (result.code === 0) {
+                        this.$message.success(result.msg);
+                        this.$router.push('/login');
+                    } else {
+                        this.$message.error(result.msg);
+                    }
+                })
             },
             collapse() {
                 this.collapsed = !this.collapsed
@@ -48,48 +71,26 @@
     }
 </script>
 <style scoped>
-    .header {
-        position: relative;
-        box-sizing: border-box;
-        width: 100%;
-        height: 50px;
-        font-size: 22px;
-        line-height: 50px;
-        color: #fff;
+    .nav {
+        background-color: cyan;
     }
 
-    .header .logo {
-        float: left;
-        width: 200px;
-        text-align: center;
-    }
-
-    .user-info {
+    .el-menu {
+        background-color: cyan;
         float: right;
-        padding-right: 50px;
-        font-size: 16px;
-        color: #fff;
     }
 
-    .user-info .el-dropdown-link {
-        position: relative;
-        display: inline-block;
-        padding-left: 50px;
-        color: #fff;
-        cursor: pointer;
+    .logo {
+        margin: auto;
+
+    }
+
+    .logo h1 {
         vertical-align: middle;
     }
 
-    .user-info .user-logo {
-        position: absolute;
-        left: 0;
-        top: 5px;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+    .logo img {
+        padding: 10px;
     }
 
-    .el-dropdown-menu__item {
-        text-align: center;
-    }
 </style>
