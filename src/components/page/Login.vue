@@ -64,7 +64,7 @@
                                 if (result.code === 0) {
                                     this.$message.success(result.msg);
                                     // 存储用户信息
-                                    sessionStorage.setItem('userInfo', JSON.stringify(result.data));
+                                    sessionStorage.setItem('userInfo', JSON.stringify(result.data.data));
                                     // 跳转页面
                                     that.$router.push('/messageBoard');
                                 } else {

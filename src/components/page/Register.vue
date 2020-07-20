@@ -24,7 +24,6 @@
                         <router-link to="/login">返回登录</router-link>
                     </el-link>
                 </el-form-item>
-
             </el-form>
         </el-col>
     </el-row>

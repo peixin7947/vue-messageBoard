@@ -1,30 +1,26 @@
 <template>
-    <el-container style="height: 100%; border: 1px solid #eee">
+    <el-container class="container">
         <el-header style="vertical-align: center;">
             <v-head></v-head>
         </el-header>
         <el-main>
-            <el-table :data="tableData" stripe class="msgTable">
-                <el-table-column prop="date" label="日期" width="140">
-                </el-table-column>
-                <el-table-column prop="nickname" label="姓名" width="120">
-                </el-table-column>
-                <el-table-column prop="content" label="留言内容">
-                </el-table-column>
-                <el-table-column label="操作">
+            <el-row>
+
+            </el-row>
+            <el-table :data="items" stripe :show-header="false" class="msgTable">
+                <el-table-column prop="creator.nickname" label="用户" width="120">
                     <template slot-scope="scope">
-                        <el-button
-                                size="mini"
-                                @click="handleEdit(scope.$index, scope.row)">编辑
-                        </el-button>
-                        <el-button
-                                size="mini"
-                                type="danger"
-                                @click="handleDelete(scope.$index, scope.row)">删除
-                        </el-button>
+                        <img :src="scope.row.creator.avatar" width="40" height="40" />
                     </template>
                 </el-table-column>
-
+                <el-table-column label="类型" width="120">
+                    <el-tag>分享</el-tag>
+                </el-table-column>
+                <el-table-column prop="content" max-height="20" show-overflow-tooltip tooltip-effect="light"
+                                 label="留言内容">
+                </el-table-column>
+                <el-table-column prop="createTime" type="datetime" :formatter="dateFormat" min-width="5" fixed="right">
+                </el-table-column>
             </el-table>
         </el-main>
         <div class="block">
@@ -32,10 +28,10 @@
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="4"
-                    :page-sizes="[100, 200, 300, 400]"
-                    :page-size="100"
+                    :page-sizes="[10, 20, 30, 40]"
+                    :page-size="10"
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="400">
+                    :total="total">
             </el-pagination>
         </div>
     </el-container>
@@ -43,23 +39,36 @@
 
 <script>
     import vHead from '../common/Header.vue';
+    import moment from 'moment';
 
     export default {
         name: "MessageBoard",
+        created() {
+            this.$http.get('/api/message')
+                .then((res) => {
+                    const data = res.data.data;
+                    this.items = data.items;
+                    this.total = data.total;
+                });
+
+        },
         data() {
-            const item = {
-                date: '2016-05-02',
-                nickname: '王小虎',
-                content: '上海市普陀区金沙江路 1518 弄'
-            };
             return {
-                tableData: Array(20).fill(item),
+                items: this.items,
+                total: this.total,
             };
         },
         components: {
             vHead,
         },
         methods: {
+            dateFormat: function (row, column) {
+                const date = row[column.property];
+                if (date === undefined) {
+                    return "";
+                }
+                return moment(date).format("YYYY-MM-DD");
+            },
             handleEdit(index, row) {
                 console.log(index, row);
             },
@@ -77,6 +86,12 @@
 </script>
 
 <style scoped>
+    .container {
+        height: 100%;
+        width: 80%;
+        margin: auto;
+    }
+
     .msgTable {
         height: 100%;
         width: 100%;
