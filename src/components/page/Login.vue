@@ -102,7 +102,6 @@
 
     /*表格样式*/
     .bg-purple-light {
-        /*background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);*/
         background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
     }
 

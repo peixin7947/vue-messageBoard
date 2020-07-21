@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Login from '../components/page/Login.vue';
 import Register from '../components/page/Register.vue';
 import MessageBoard from '../components/page/MessageBoard.vue';
+import MessageDetail from "../components/page/MessageDetail";
 
 Vue.use(Router);
 
@@ -31,6 +32,13 @@ const router = new Router({
       component: MessageBoard,
       meta: {
         title: '留言板',
+      },
+    },
+    {
+      path: '/messageDetail',
+      component: MessageDetail,
+      meta: {
+        title: '留言详情',
       },
     },
   ],
