@@ -16,12 +16,11 @@
                             <div class="msgInfo">
                             <span style="font-size: 12px; padding-left: 5px">
                                 创建者{{message.creator.nickname}} 于 {{dateFormat(message.createTime)}} 发布·
-                                <!--                                {{message.createTime}}-->
                             </span>
                             </div>
                         </div>
                         <div class="msgContent">
-                            <span style="padding: 10px">{{message.content}}</span>
+                            <span>{{message.content}}</span>
                         </div>
                     </el-card>
 
@@ -43,7 +42,6 @@
                             <span style="margin: 10px;padding-top: 30px;">
                                  {{ reply.content }}
                             </span>
-
                             <el-divider></el-divider>
                         </div>
                     </el-card>
@@ -72,7 +70,10 @@
 
     export default {
         name: "MessageDetail",
-        beforeCreate() {
+        created() {
+            this.init();
+        },
+        init() {
             this.$http.get('/api/message/' + this.$route.query.messageId)
                 .then((res) => {
                     const data = res.data;
@@ -121,8 +122,9 @@
                                     this.$message.success(result.msg);
                                     // 刷新留言板数据
                                     this.init();
-                                    // 情况写留言的内容
+                                    // 清空写留言的内容
                                     this.$refs[formName].resetFields();
+                                    this.init();
                                 } else {
                                     this.$message.error(result.msg);
                                 }
@@ -157,6 +159,7 @@
     }
 
     .msgContent {
+        white-space: pre-line;
         height: 100%;
         width: auto;
     }

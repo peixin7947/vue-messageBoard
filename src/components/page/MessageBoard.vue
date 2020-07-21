@@ -153,6 +153,7 @@
                 const that = this;
                 that.$refs[formName].validate((valid) => {
                     if (valid) {
+                        // this.messageForm.content = this.messageForm.content.replace(/\n/gi,"<br/>");
                         this.$http.post('/api/message', this.messageForm)
                             .then((res) => {
                                 const result = res.data;
