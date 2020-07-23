@@ -87,7 +87,7 @@
     export default {
         name: "MessageBoard",
         created() {
-            this.$userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
             this.init();
         },
         data() {

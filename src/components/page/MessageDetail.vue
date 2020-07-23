@@ -19,9 +19,7 @@
                             </span>
                             </div>
                         </div>
-                        <div class="msgContent">
-                            <span>{{message.content}}</span>
-                        </div>
+                        <pre style="font-size: 18px">{{message.content}}</pre>
                     </el-card>
                 </el-main>
                 <el-footer>
@@ -32,21 +30,55 @@
                                    @click="putReplyFormVisible = true">写评论
                         </el-button>
                     </div>
-                    <el-card style="white-space: pre-line">
-                        <div v-for="(reply, index) in message.reply" v-bind:key="index">
+                    <el-card>
+                        <div v-for="(reply, index) in message.reply" v-bind:key="index" style="height: auto">
                             <div slot="header" style="margin-bottom: 10px">
                                 <span style="font-size: 12px;">
                                     创建者 {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
                                 </span>
+                                <div style="float: right">
+                                    <el-button v-if="userInfo._id === reply.creator._id">编辑</el-button>
+                                    <el-button v-if="userInfo._id === reply.creator._id">删除</el-button>
+                                </div>
                             </div>
-                            <pre class="replyContent">{{ reply.content }}</pre>
+                            <div style="display: block;height: auto">
+                                <pre class="replyContent">{{ reply.content }}</pre>
+                            </div>
                             <el-divider></el-divider>
                         </div>
                     </el-card>
                 </el-footer>
             </el-container>
         </el-scrollbar>
-        <el-dialog title="评论留言" :visible.sync="putReplyFormVisible">
+        <el-dialog title="删除评论" :visible.sync="deleteMsgFormVisible">
+            <h1>确认删除该留言？</h1>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="doDeleteMsg()">确定</el-button>
+                <el-button @click="deleteMsgFormVisible = false; this.msg = null">取 消</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog title="编辑评论" :visible.sync="editMsgFormVisible">
+            <el-form v-if="msg" :model="msg" status-icon :rules="rules" ref="putMsgForm">
+                <el-form-item label="标签" label-width="60px" prop="title">
+                    <el-select v-model="msg.tag" placeholder="请选择标签">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="内容" label-width="60px" prop="content">
+                    <el-input class="contentArea" type="textarea" v-model="msg.content"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="putMsg('putMsgForm')">修 改</el-button>
+                <el-button @click="editMsgFormVisible = false;this.msg = null">取 消</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog title="回复" :visible.sync="putReplyFormVisible">
             <el-form :model="replyForm" status-icon :rules="rules" ref="putReplyForm">
                 <el-form-item label="内容" label-width="60px" prop="content">
                     <el-input class="contentArea" type="textarea" v-model="replyForm.content"></el-input>
@@ -69,11 +101,13 @@
         name: "MessageDetail",
         created() {
             this.init();
+            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
         },
 
         data() {
             return {
                 putReplyFormVisible: false,
+                userInfo: this.userInfo,
                 message: this.message,
                 replyForm: {
                     messageId: null,
@@ -156,14 +190,8 @@
     }
 
     .replyContent {
-        font-size: 18px;
-        width: auto;
-    }
-
-    .msgContent {
-        /*white-space: pre-wrap;*/
-        /*height: 100%;*/
-        /*width: auto;*/
+        font-size: 14px;
+        width: 90%;
     }
 
     .el-scrollbar {
