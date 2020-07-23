@@ -33,19 +33,19 @@
                                    @click="putReplyFormVisible = true">写评论
                         </el-button>
                     </div>
-                    <el-card>
-                        <div v-for="(reply, index) in message.reply" v-bind:key="index" class="infinite-list-item">
-                            <span style="font-size: 12px; padding-left: 5px">
-                                创建者 {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
-                            </span>
-                            <br/>
-                            <span style="margin: 10px;padding-top: 30px;">
+                    <el-card style="white-space: pre-line">
+                        <div v-for="(reply, index) in message.reply" v-bind:key="index">
+                            <div slot="header" style="margin-bottom: 10px">
+                                <span style="font-size: 12px;">
+                                    创建者 {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
+                                </span>
+                            </div>
+                            <p class="replyContent">
                                  {{ reply.content }}
-                            </span>
+                            </p>
                             <el-divider></el-divider>
                         </div>
                     </el-card>
-
                 </el-footer>
             </el-container>
         </el-scrollbar>
@@ -73,14 +73,7 @@
         created() {
             this.init();
         },
-        init() {
-            this.$http.get('/api/message/' + this.$route.query.messageId)
-                .then((res) => {
-                    const data = res.data;
-                    this.message = data.data;
-                    console.log(this.message);
-                });
-        },
+
         data() {
             return {
                 putReplyFormVisible: false,
@@ -101,6 +94,14 @@
             vHead,
         },
         methods: {
+            init() {
+                this.$http.get('/api/message/' + this.$route.query.messageId)
+                    .then((res) => {
+                        const data = res.data;
+                        this.message = data.data;
+                        console.log(this.message);
+                    });
+            },
             dateFormat: function (date) {
                 if (date === undefined) {
                     return "";
@@ -115,6 +116,8 @@
                             this.replyForm.messageId = this.message._id;
                             this.replyForm.toUser = this.message.creator._id;
                         }
+                        // this.replyForm.content = this.replyForm.content.replace(new RegExp('\\n',"gi"), "<br/>")
+                        this.replyForm.content = this.replyForm.content.substring(1);
                         this.$http.post('/api/reply', this.replyForm)
                             .then((res) => {
                                 const result = res.data;
@@ -124,7 +127,6 @@
                                     this.init();
                                     // 清空写留言的内容
                                     this.$refs[formName].resetFields();
-                                    this.init();
                                 } else {
                                     this.$message.error(result.msg);
                                 }
@@ -158,8 +160,14 @@
         height: 600px;
     }
 
+    /*.replyContent {*/
+    /*    white-space: pre-wrap;*/
+    /*    height: 100%;*/
+    /*    width: auto;*/
+    /*}*/
+
     .msgContent {
-        white-space: pre-line;
+        white-space: pre-wrap;
         height: 100%;
         width: auto;
     }

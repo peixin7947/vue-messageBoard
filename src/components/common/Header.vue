@@ -1,7 +1,7 @@
 <template>
     <el-row type="flex" align="top" justify="center" class="nav">
         <el-col :span="1">
-            <img style="width: 40px; height: 40px; float: right" src="../../../static/images/logo.png" fit="contain" />
+            <img style="width: 40px; height: 40px; float: right" src="../../../static/images/logo.png" fit="contain"/>
         </el-col>
         <el-col :span="3" class="logo">
             <h1>留言板</h1>
@@ -12,7 +12,7 @@
                 <el-menu-item index="2">管理留言</el-menu-item>
                 <el-submenu index="3" class="">
                     <template slot="title">
-                        <el-avatar :size="50" :src="avatar"></el-avatar>
+                        <el-avatar v-if="avatar" :size="50" :src="this.avatar"></el-avatar>
                     </template>
                     <el-menu-item index="3-1">个人信息</el-menu-item>
                     <el-menu-item index="3-2">退出登录</el-menu-item>
@@ -43,6 +43,10 @@
                         break;
                     case "2":
                         this.$router.push('/managerMessage').catch(() => {
+                        });
+                        break;
+                    case "3-1":
+                        this.$router.push('/information').catch(() => {
                         });
                         break;
                     case "3-2":

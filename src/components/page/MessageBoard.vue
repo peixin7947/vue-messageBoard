@@ -7,10 +7,10 @@
             <!-- 留言主窗口 -->
             <el-main>
                 <el-table :data="items" stripe :show-header="false" class="msgTable">
-                    <el-table-column prop="creator.nickname" label="用户" width="120">
-                        <template slot-scope="scope">
-                            <img :src="scope.row.creator.avatar" width="40" height="40"/>
-                        </template>
+                    <el-table-column  label="用户" width="120">
+<!--                        <template slot-scope="scope">-->
+<!--                            <img :src="scope.row.creator.avatar" width="40" height="40"/>-->
+<!--                        </template>-->
                     </el-table-column>
                     <el-table-column label="类型" width="120">
                         <template slot-scope="scope">

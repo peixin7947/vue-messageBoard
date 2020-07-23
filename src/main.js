@@ -11,7 +11,7 @@ Vue.prototype.$queryString = querystring;
 Vue.prototype.$http = axios.create({
     withCredentials: true,
     baseURL: 'http://localhost:7001',
-    timeout: 3000,
+    timeout: 30000,
 });
 Vue.prototype.$url = 'http://localhost:7001';
 Vue.use(ElementUI);

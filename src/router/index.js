@@ -4,6 +4,7 @@ import Login from '../components/page/Login.vue';
 import Register from '../components/page/Register.vue';
 import MessageBoard from '../components/page/MessageBoard.vue';
 import MessageDetail from "../components/page/MessageDetail";
+import Information from "../components/page/Information";
 
 Vue.use(Router);
 
@@ -39,6 +40,13 @@ const router = new Router({
       component: MessageDetail,
       meta: {
         title: '留言详情',
+      },
+    },
+    {
+      path: '/information',
+      component: Information,
+      meta: {
+        title: '个人信息',
       },
     },
   ],
