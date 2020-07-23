@@ -81,8 +81,8 @@
                         </el-form-item>
                         <el-form-item label="性别" label-width="20%" prop="sex">
                             <el-select v-model="informationForm.sex" value="" placeholder="请选择性别">
-                                <el-option key="男" label="男" :value="1"></el-option>
-                                <el-option key="男" label="女" :value="0"></el-option>
+                                <el-option key="1" label="男" :value="1"></el-option>
+                                <el-option key="0" label="女" :value="0"></el-option>
                             </el-select>
                         </el-form-item>
 
@@ -98,6 +98,7 @@
             </el-main>
         </el-container>
     </el-container>
+
 </template>
 
 <script>

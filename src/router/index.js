@@ -5,14 +5,16 @@ import Register from '../components/page/Register.vue';
 import MessageBoard from '../components/page/MessageBoard.vue';
 import MessageDetail from "../components/page/MessageDetail";
 import Information from "../components/page/Information";
+import ManagerMessage from "../components/page/ManagerMessage";
 
 Vue.use(Router);
 
 const router = new Router({
+  mode: 'hash',
   routes: [
     {
       path: '/',
-      redirect: '/login',
+      component: Login,
     },
     {
       path: '/login',
@@ -33,6 +35,13 @@ const router = new Router({
       component: MessageBoard,
       meta: {
         title: '留言板',
+      },
+    },
+    {
+      path: '/managerMessage',
+      component: ManagerMessage,
+      meta: {
+        title: '管理留言',
       },
     },
     {

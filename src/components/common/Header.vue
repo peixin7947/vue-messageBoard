@@ -12,8 +12,9 @@
                 <el-menu-item index="2">管理留言</el-menu-item>
                 <el-submenu index="3" class="">
                     <template slot="title">
-                        <el-avatar v-if="avatar" :size="50" :src="this.avatar"></el-avatar>
+                        <el-avatar v-if="avatar" :size="50" :src="avatar"></el-avatar>
                     </template>
+                    <el-menu-item path="123">欢迎你，{{this.userInfo.nickname}}</el-menu-item>
                     <el-menu-item index="3-1">个人信息</el-menu-item>
                     <el-menu-item index="3-2">退出登录</el-menu-item>
                 </el-submenu>

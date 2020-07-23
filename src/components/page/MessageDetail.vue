@@ -23,7 +23,6 @@
                             <span>{{message.content}}</span>
                         </div>
                     </el-card>
-
                 </el-main>
                 <el-footer>
                     <el-divider></el-divider>
@@ -40,9 +39,7 @@
                                     创建者 {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
                                 </span>
                             </div>
-                            <p class="replyContent">
-                                 {{ reply.content }}
-                            </p>
+                            <pre class="replyContent">{{ reply.content }}</pre>
                             <el-divider></el-divider>
                         </div>
                     </el-card>
@@ -116,8 +113,6 @@
                             this.replyForm.messageId = this.message._id;
                             this.replyForm.toUser = this.message.creator._id;
                         }
-                        // this.replyForm.content = this.replyForm.content.replace(new RegExp('\\n',"gi"), "<br/>")
-                        this.replyForm.content = this.replyForm.content.substring(1);
                         this.$http.post('/api/reply', this.replyForm)
                             .then((res) => {
                                 const result = res.data;
@@ -160,16 +155,15 @@
         height: 600px;
     }
 
-    /*.replyContent {*/
-    /*    white-space: pre-wrap;*/
-    /*    height: 100%;*/
-    /*    width: auto;*/
-    /*}*/
+    .replyContent {
+        font-size: 18px;
+        width: auto;
+    }
 
     .msgContent {
-        white-space: pre-wrap;
-        height: 100%;
-        width: auto;
+        /*white-space: pre-wrap;*/
+        /*height: 100%;*/
+        /*width: auto;*/
     }
 
     .el-scrollbar {
