@@ -45,14 +45,14 @@
                 </div>
             </el-main>
 
-            <el-dialog title="删除留言" :visible.sync="deleteMsgFormVisible">
+            <el-dialog v-if="msg" title="删除留言" :visible.sync="deleteMsgFormVisible">
                 <h1>确认删除该留言？</h1>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="doDeleteMsg()">确定</el-button>
                     <el-button @click="deleteMsgFormVisible = false; this.msg = null">取 消</el-button>
                 </div>
             </el-dialog>
-            <el-dialog title="编辑留言" :visible.sync="editMsgFormVisible">
+            <el-dialog  :close-on-click-modal="false" title="编辑留言" :visible.sync="editMsgFormVisible">
                 <el-form v-if="msg" :model="msg" status-icon :rules="rules" ref="putMsgForm">
                     <el-form-item label="标题" label-width="60px" prop="title">
                         <el-input v-model="msg.title" autocomplete="off"></el-input>
@@ -73,7 +73,7 @@
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="putMsg('putMsgForm')">修 改</el-button>
-                    <el-button @click="editMsgFormVisible = false;this.msg = null">取 消</el-button>
+                    <el-button @click="editMsgFormVisible = false;">取 消</el-button>
                 </div>
             </el-dialog>
         </el-container>
@@ -127,7 +127,7 @@
         },
         methods: {
             init: function () {
-                this.$http.get(('/api/user/message/' + this.$userInfo._id))
+                this.$http.get(('/api/user/message/' + this.userInfo._id))
                     .then((res) => {
                         const data = res.data.data;
                         this.items = data.items;

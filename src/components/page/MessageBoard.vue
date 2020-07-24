@@ -56,7 +56,7 @@
                 <v-talk></v-talk>
             </el-aside>
 
-            <el-dialog title="发布留言" :visible.sync="putMsgFormVisible">
+            <el-dialog title="发布留言" :close-on-click-modal="false" :visible.sync="putMsgFormVisible">
                 <el-form :model="messageForm" status-icon :rules="rules" ref="putMsgForm">
                     <el-form-item label="标题" label-width="60px" prop="title">
                         <el-input v-model="messageForm.title" autocomplete="off"></el-input>

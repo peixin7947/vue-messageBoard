@@ -27,7 +27,7 @@
                     <div style="display: block;padding-bottom: 30px">
                         <span style="font-size: 24px; padding-left: 10px">共有{{message.reply.length}}条评论</span>
                         <el-button style="float: right;" icon="el-icon-edit" type="primary"
-                                   @click="putReplyFormVisible = true">写评论
+                                   @click="createReplyFormVisible = true">写评论
                         </el-button>
                     </div>
                     <el-card>
@@ -36,9 +36,19 @@
                                 <span style="font-size: 12px;">
                                     创建者 {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
                                 </span>
+                                <el-tooltip placement="top">
+                                    <div slot="content">{{reply.content}}</div><span style="background-color: #409EFF">查看回复内容</span>
+                                </el-tooltip>
                                 <div style="float: right">
-                                    <el-button v-if="userInfo._id === reply.creator._id">编辑</el-button>
-                                    <el-button v-if="userInfo._id === reply.creator._id">删除</el-button>
+                                    <el-button v-if="userInfo._id !== reply.creator._id" @click="onPutReply(index)">
+                                        回复
+                                    </el-button>
+                                    <el-button v-if="userInfo._id === reply.creator._id" @click="onEditReply(index)">
+                                        编辑
+                                    </el-button>
+                                    <el-button v-if="userInfo._id === reply.creator._id" @click="onDeleteReply(index)">
+                                        删除
+                                    </el-button>
                                 </div>
                             </div>
                             <div style="display: block;height: auto">
@@ -50,43 +60,43 @@
                 </el-footer>
             </el-container>
         </el-scrollbar>
-        <el-dialog title="删除评论" :visible.sync="deleteMsgFormVisible">
+        <el-dialog title="删除评论" :visible.sync="deleteReplyFormVisible">
             <h1>确认删除该留言？</h1>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="doDeleteMsg()">确定</el-button>
-                <el-button @click="deleteMsgFormVisible = false; this.msg = null">取 消</el-button>
+                <el-button type="primary" @click="deleteReply()">确定</el-button>
+                <el-button @click="deleteReplyFormVisible = false;">取 消</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="编辑评论" :visible.sync="editMsgFormVisible">
-            <el-form v-if="msg" :model="msg" status-icon :rules="rules" ref="putMsgForm">
-                <el-form-item label="标签" label-width="60px" prop="title">
-                    <el-select v-model="msg.tag" placeholder="请选择标签">
-                        <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+        <el-dialog :close-on-click-modal="false" title="编辑评论" :visible.sync="editReplyFormVisible">
+            <el-form v-if="form" :model="form" status-icon :rules="rules" ref="editReplyForm">
                 <el-form-item label="内容" label-width="60px" prop="content">
-                    <el-input class="contentArea" type="textarea" v-model="msg.content"></el-input>
+                    <el-input class="contentArea" type="textarea" v-model="form.content"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="putMsg('putMsgForm')">修 改</el-button>
-                <el-button @click="editMsgFormVisible = false;this.msg = null">取 消</el-button>
+                <el-button type="primary" @click="editReply('editReplyForm')">修 改</el-button>
+                <el-button @click="editReplyFormVisible = false;">取 消</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="回复" :visible.sync="putReplyFormVisible">
-            <el-form :model="replyForm" status-icon :rules="rules" ref="putReplyForm">
+        <el-dialog :close-on-click-modal="false" title="评论留言" :visible.sync="createReplyFormVisible">
+            <el-form :model="replyForm" status-icon :rules="rules" ref="createReplyForm">
                 <el-form-item label="内容" label-width="60px" prop="content">
                     <el-input class="contentArea" type="textarea" v-model="replyForm.content"></el-input>
                 </el-form-item>
             </el-form>
-
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="putReply('putReplyForm')">发 布</el-button>
+                <el-button type="primary" @click="createReply('createReplyForm')">发 布</el-button>
+                <el-button @click="createReplyFormVisible = false">取 消</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog :close-on-click-modal="false" title="回复评论" :visible.sync="putReplyFormVisible">
+            <el-form :model="form" status-icon :rules="rules" ref="createReplyForm">
+                <el-form-item label="内容" label-width="60px" prop="content">
+                    <el-input class="contentArea" type="textarea" v-model="form.content"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="putReply('createReplyForm')">回 复</el-button>
                 <el-button @click="putReplyFormVisible = false">取 消</el-button>
             </div>
         </el-dialog>
@@ -106,9 +116,13 @@
 
         data() {
             return {
+                deleteReplyFormVisible: false,
+                editReplyFormVisible: false,
+                createReplyFormVisible: false,
                 putReplyFormVisible: false,
                 userInfo: this.userInfo,
                 message: this.message,
+                form: {},
                 replyForm: {
                     messageId: null,
                     content: null,
@@ -125,12 +139,12 @@
             vHead,
         },
         methods: {
+            // 初始化数据
             init() {
                 this.$http.get('/api/message/' + this.$route.query.messageId)
                     .then((res) => {
                         const data = res.data;
                         this.message = data.data;
-                        console.log(this.message);
                     });
             },
             dateFormat: function (date) {
@@ -140,7 +154,60 @@
                 moment.locale('zh-cn');
                 return moment(date).format('llll');
             },
-            putReply(formName) {
+            // 删除评论
+            onDeleteReply(index) {
+                this.deleteReplyFormVisible = true;
+                this.form = {
+                    id: this.message.reply[index]._id
+                };
+            },
+            deleteReply() {
+                this.$http.delete('/api/message', {data: this.form})
+                    .then((res) => {
+                        const result = res.data;
+                        if (result.code === 0) {
+                            this.$message.success(result.msg);
+                            // 刷新留言板数据
+                            this.init();
+                        } else {
+                            this.$message.error(result.msg);
+                        }
+                    })
+                this.deleteReplyFormVisible = false
+            },
+            // 编辑评论
+            editReply(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$http.put('/api/message', this.form)
+                            .then((res) => {
+                                const result = res.data;
+                                if (result.code === 0) {
+                                    this.$message.success(result.msg);
+                                    // 刷新留言板数据
+                                    this.init();
+                                } else {
+                                    this.$message.error(result.msg);
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else {
+                        return false;
+                    }
+                });
+                this.editReplyFormVisible = false
+            },
+            onEditReply(index) {
+                this.editReplyFormVisible = true;
+                this.form = {
+                    id: this.message.reply[index]._id,
+                    content: this.message.reply[index].content,
+                };
+            },
+            // 写评论
+            createReply(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         if (this.replyForm.toUser === null) {
@@ -167,8 +234,39 @@
                         return false;
                     }
                 });
-                this.putReplyFormVisible = false
+                this.createReplyFormVisible = false
             },
+            // 回复评论
+            onPutReply(index){
+                this.putReplyFormVisible = true;
+                this.form = {
+                    messageId: this.message.reply[index]._id,
+                    toUser: this.message.reply[index].creator._id,
+                };
+            },
+            putReply(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$http.post('/api/reply', this.form)
+                            .then((res) => {
+                                const result = res.data;
+                                if (result.code === 0) {
+                                    this.$message.success(result.msg);
+                                    // 刷新留言板数据
+                                    this.init();
+                                } else {
+                                    this.$message.error(result.msg);
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else {
+                        return false;
+                    }
+                });
+                this.putReplyFormVisible = false
+            }
         },
     }
 </script>
