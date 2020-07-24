@@ -33,12 +33,10 @@
                     <el-card>
                         <div v-for="(reply, index) in message.reply" v-bind:key="index" style="height: auto">
                             <div slot="header" style="margin-bottom: 10px">
-                                <span style="font-size: 12px;">
+                                <span style="font-size: 12px;margin: 5px;display: block;">
                                     创建者 {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
                                 </span>
-                                <el-tooltip placement="top">
-                                    <div slot="content">{{reply.content}}</div><span style="background-color: #409EFF">查看回复内容</span>
-                                </el-tooltip>
+                                <pre style="white-space: pre-wrap;margin:10px;font-size:14px;background-color: #f3e7e9">{{reply.content}}</pre>
                                 <div style="float: right">
                                     <el-button v-if="userInfo._id !== reply.creator._id" @click="onPutReply(index)">
                                         回复
