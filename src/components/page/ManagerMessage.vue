@@ -19,7 +19,8 @@
                             </router-link>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="content" style="float: left;" label="内容" width="800" show-overflow-tooltip>
+                    <el-table-column prop="content" style="float: left;" label="内容" width="800" class="contentTooltip"
+                                     show-overflow-tooltip>
                     </el-table-column>
                     <el-table-column prop="createTime" type="datetime" :formatter="dateFormat" min-width="40"
                                      label="发布日期" fixed="right">
@@ -52,7 +53,7 @@
                     <el-button @click="deleteMsgFormVisible = false; this.msg = null">取 消</el-button>
                 </div>
             </el-dialog>
-            <el-dialog  :close-on-click-modal="false" title="编辑留言" :visible.sync="editMsgFormVisible">
+            <el-dialog :close-on-click-modal="false" title="编辑留言" :visible.sync="editMsgFormVisible">
                 <el-form v-if="msg" :model="msg" status-icon :rules="rules" ref="putMsgForm">
                     <el-form-item label="标题" label-width="60px" prop="title">
                         <el-input v-model="msg.title" autocomplete="off"></el-input>
@@ -214,12 +215,6 @@
         width: 100%;
     }
 
-    .box-card {
-        height: 200px;
-        width: auto;
-        margin: 10px;
-    }
-
     .contentArea >>> .el-textarea__inner {
         resize: none;
         max-height: 800px;
@@ -227,5 +222,9 @@
         width: 100%;
     }
 
-
+</style>
+<style>
+    .el-tooltip__popper {
+        max-width: 600px;
+    }
 </style>
