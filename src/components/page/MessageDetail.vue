@@ -103,9 +103,11 @@
             </div>
         </el-dialog>
         <el-dialog :close-on-click-modal="false" title="评论留言" :visible.sync="createReplyFormVisible">
-            <el-form :model="replyForm" status-icon :rules="rules" ref="createReplyForm">
+            <el-form :model="form" status-icon :rules="rules" ref="createReplyForm">
                 <el-form-item label="内容" label-width="60px" prop="content">
-                    <el-input class="contentArea" type="textarea" v-model="replyForm.content"></el-input>
+                    <el-input class="contentArea" type="textarea" maxlength="1024" v-model="form.content"
+                              @input="commentInput"></el-input>
+                    <span style="float: right;">{{remnant}}/1024</span>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -115,8 +117,9 @@
         </el-dialog>
         <el-dialog :close-on-click-modal="false" title="回复评论" :visible.sync="putReplyFormVisible">
             <el-form :model="form" status-icon :rules="rules" ref="createReplyForm">
-                <el-form-item label="内容" label-width="60px" prop="content">
+                <el-form-item label="内容" label-width="60px" maxlength="1024" prop="content" @input="commentInput">
                     <el-input class="contentArea" type="textarea" v-model="form.content"></el-input>
+                    <span style="float: right;">{{remnant}}/1024</span>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -140,6 +143,7 @@
 
         data() {
             return {
+                remnant: 0,
                 deleteReplyFormVisible: false,
                 editReplyFormVisible: false,
                 createReplyFormVisible: false,
@@ -147,11 +151,7 @@
                 userInfo: this.userInfo,
                 message: this.message,
                 form: {},
-                replyForm: {
-                    messageId: null,
-                    content: null,
-                    toUser: null,
-                },
+
                 rules: {
                     content: [
                         {required: true, message: '请输入评论', trigger: 'blur'},
@@ -163,6 +163,9 @@
             vHead,
         },
         methods: {
+            commentInput() {
+                this.remnant = this.form.content.length;
+            },
             // 初始化数据
             init() {
                 this.$http.get('/api/message/' + this.$route.query.messageId)
@@ -234,11 +237,9 @@
             createReply(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        if (this.replyForm.toUser === null) {
-                            this.replyForm.messageId = this.message._id;
-                            this.replyForm.toUser = this.message.creator._id;
-                        }
-                        this.$http.post('/api/comment', this.replyForm)
+                        this.form.messageId = this.message._id;
+                        this.form.toUser = this.message.creator._id;
+                        this.$http.post('/api/comment', this.form)
                             .then((res) => {
                                 const result = res.data;
                                 if (result.code === 0) {
@@ -268,7 +269,7 @@
                     commentId: this.message.comments[index]._id,
                 };
                 if (index1) {
-                    this.form.toUser= this.message.comments[index].reply[index1].creator._id;
+                    this.form.toUser = this.message.comments[index].reply[index1].creator._id;
                 } else {
                     this.form.toUser = this.message.comments[index].creator._id;
                 }

@@ -1,8 +1,5 @@
 <template>
-    <el-container class="container">
-        <el-header style="">
-            <v-head></v-head>
-        </el-header>
+    <el-container style="height: 1000px">
         <el-container v-if="items">
             <!-- 留言主窗口 -->
             <el-main>
@@ -45,7 +42,6 @@
                     </el-pagination>
                 </div>
             </el-main>
-
             <el-dialog v-if="msg" title="删除留言" :visible.sync="deleteMsgFormVisible">
                 <h1>确认删除该留言？</h1>
                 <div slot="footer" class="dialog-footer">
@@ -84,7 +80,6 @@
 </template>
 
 <script>
-    import vHead from '../common/Header.vue';
     import moment from 'moment';
 
     export default {
@@ -127,9 +122,6 @@
                     ],
                 },
             };
-        },
-        components: {
-            vHead,
         },
         methods: {
             commentInput() {
@@ -176,7 +168,7 @@
                     content: this.items[row].content,
                     tag: this.items[row].tag,
                 };
-                this.remnant =  this.items[row].content.length;
+                this.remnant = this.items[row].content.length;
 
             },
             putMsg(formName) {
@@ -222,7 +214,6 @@
 <style scoped>
     .container {
         height: 100%;
-        width: 80%;
         margin: auto;
     }
 

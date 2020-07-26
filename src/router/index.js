@@ -6,6 +6,8 @@ import MessageBoard from '../components/page/MessageBoard.vue';
 import MessageDetail from "../components/page/MessageDetail";
 import Information from "../components/page/Information";
 import ManagerMessage from "../components/page/ManagerMessage";
+import ResetPassword from "../components/page/ResetPassword";
+import UserManage from "../components/page/UserManage";
 
 Vue.use(Router);
 
@@ -28,6 +30,13 @@ const router = new Router({
       component: Register,
       meta: {
         title: '注册页面',
+      },
+    },
+    {
+      path: '/resetPassword',
+      component: ResetPassword,
+      meta: {
+        title: '忘记密码',
       },
     },
     {
@@ -56,6 +65,13 @@ const router = new Router({
       component: Information,
       meta: {
         title: '个人信息',
+      },
+    },
+    {
+      path: '/userManage',
+      component: UserManage,
+      meta: {
+        title: '管理留言',
       },
     },
   ],

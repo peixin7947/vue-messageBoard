@@ -43,7 +43,7 @@
                         });
                         break;
                     case "2":
-                        this.$router.push('/managerMessage').catch(() => {
+                        this.$router.push('/userManage').catch(() => {
                         });
                         break;
                     case "3-1":

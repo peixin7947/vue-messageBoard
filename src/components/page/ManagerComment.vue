@@ -1,33 +1,19 @@
 <template>
-    <el-container class="container">
-        <el-header style="">
-            <v-head></v-head>
-        </el-header>
-        <el-container>
-            <!-- 留言主窗口 -->
-            <el-main v-if="items">
-                <el-table :data="items" stripe :show-header="false" class="msgTable">
-                    <el-table-column label="用户" width="120">
-                        <template slot-scope="scope">
-                            <img :src="'http://localhost:7001'+ (scope.row.creator ? scope.row.creator.avatar: null)"
-                                 width="40" height="40"/>
-                            {{scope.row.creator ? scope.row.creator.nickname: null}}
-                        </template>
+    <el-container style="height: 1000px">
+        <el-container v-if="items">
+            <el-main>
+                <el-table :data="items" type=index stripe class="msgTable">
+                    <el-table-column prop="content" style="float: left;" label="内容" width="800" class="contentTooltip"
+                                     show-overflow-tooltip>
                     </el-table-column>
-                    <el-table-column label="类型" width="120">
-                        <template slot-scope="scope">
-                            <el-tag>{{scope.row.tag}}</el-tag>
-                        </template>
+                    <el-table-column prop="createTime" type="datetime" :formatter="dateFormat" min-width="40"
+                                     label="发布日期" fixed="right">
                     </el-table-column>
-                    <el-table-column prop="content" max-height="20" label="留言">
+                    <el-table-column min-width="50" fixed="right" label="操作" style="float: right;">
                         <template slot-scope="scope">
-                            <router-link :to="{ path: '/messageDetail', query: { messageId: scope.row._id }}">
-                                {{scope.row.title}}
-                            </router-link>
+                            <el-button @click="editMsg(scope.$index)">编辑</el-button>
+                            <el-button @click="deleteMsg(scope.$index)">删除</el-button>
                         </template>
-                    </el-table-column>
-                    <el-table-column prop="createTime" type="datetime" :formatter="dateFormat" min-width="10"
-                                     fixed="right">
                     </el-table-column>
                 </el-table>
                 <!-- 分页 -->
@@ -43,26 +29,20 @@
                     </el-pagination>
                 </div>
             </el-main>
-            <!-- 侧边栏卡片 -->
-            <el-aside>
-                <el-card class="box-card">
-                    <div slot="header" class="">
-                        <span>欢迎发布留言</span>
-                    </div>
-                    <el-button style="float: left;" icon="el-icon-edit" type="primary"
-                               @click="putMsgFormVisible = true">写留言
-                    </el-button>
-                </el-card>
-                <v-talk></v-talk>
-            </el-aside>
-
-            <el-dialog title="发布留言" :close-on-click-modal="false" :visible.sync="putMsgFormVisible">
-                <el-form :model="messageForm" status-icon :rules="rules" ref="putMsgForm">
+            <el-dialog v-if="msg" title="删除留言" :visible.sync="deleteMsgFormVisible">
+                <h1>确认删除该留言？</h1>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="doDeleteMsg()">确定</el-button>
+                    <el-button @click="deleteMsgFormVisible = false, this.msg = null">取 消</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog :close-on-click-modal="false" title="编辑留言" :visible.sync="editMsgFormVisible">
+                <el-form v-if="msg" :model="msg" status-icon :rules="rules" ref="putMsgForm">
                     <el-form-item label="标题" label-width="60px" prop="title">
-                        <el-input v-model="messageForm.title" autocomplete="off"></el-input>
+                        <el-input v-model="msg.title" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="标签" label-width="60px">
-                        <el-select v-model="messageForm.tag" placeholder="请选择标签">
+                    <el-form-item label="标签" label-width="60px" prop="title">
+                        <el-select v-model="msg.tag" placeholder="请选择标签">
                             <el-option
                                     v-for="item in options"
                                     :key="item.value"
@@ -72,14 +52,14 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="内容" label-width="60px" prop="content">
-                        <el-input class="contentArea" maxlength="1024" type="textarea" @input="commentInput"
-                                  v-model="messageForm.content"></el-input>
+                        <el-input class="contentArea" type="textarea" maxlength="1024" @input="commentInput"
+                                  v-model="msg.content"></el-input>
                         <span style="float: right;">{{remnant}}/1024</span>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="putMessage('putMsgForm')">发 布</el-button>
-                    <el-button @click="putMsgFormVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="putMsg('putMsgForm')">修 改</el-button>
+                    <el-button @click="editMsgFormVisible = false">取 消</el-button>
                 </div>
             </el-dialog>
         </el-container>
@@ -87,24 +67,24 @@
 </template>
 
 <script>
-    import vHead from '../common/Header.vue';
-    import vTalk from '../common/talkCard';
     import moment from 'moment';
 
     export default {
         name: "MessageBoard",
         created() {
+            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
             this.init();
         },
         data() {
             return {
-                remnant:0,
-                putMsgFormVisible: false,
+                remnant: 0,
+                editMsgFormVisible: false,
+                deleteMsgFormVisible: false,
                 items: this.items,
                 total: this.total,
-                pageSizes: this.pageSizes,
                 pageSize: 10,
                 pageIndex: 1,
+                msg: null,
                 options: [{
                     value: '问答',
                     label: '问答'
@@ -130,16 +110,16 @@
                 },
             };
         },
-        components: {
-            vHead,
-            vTalk,
-        },
         methods: {
-            commentInput(){
-                this.remnant = this.messageForm.content.length;
+            commentInput() {
+                this.remnant = this.msg.content.length;
             },
             init: function () {
-                this.$http.get('/api/message?pageSize=' + this.pageSize + '&pageIndex=' + this.pageIndex)
+                if (!this.pageIndex) {
+                    this.pageIndex = 1;
+                    this.pageSize = 10;
+                }
+                this.$http.get(('/api/comment/' + this.userInfo._id + "?pageIndex=" + this.pageIndex + "&pageSize=" + this.pageSize))
                     .then((res) => {
                         const data = res.data.data;
                         this.items = data.items;
@@ -161,11 +141,25 @@
                 this.pageIndex = val;
                 this.init();
             },
-            putMessage(formName) {
-                const that = this;
-                that.$refs[formName].validate((valid) => {
+            deleteMsg(row) {
+                this.deleteMsgFormVisible = true;
+                this.msg = {
+                    id: this.items[row]._id
+                };
+            },
+            editMsg(row) {
+                this.editMsgFormVisible = true;
+                this.msg = {
+                    id: this.items[row]._id,
+                    content: this.items[row].content,
+                };
+                this.remnant = this.items[row].content.length;
+
+            },
+            putMsg(formName) {
+                this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$http.post('/api/message', this.messageForm)
+                        this.$http.put('/api/comment', this.msg)
                             .then((res) => {
                                 const result = res.data;
                                 if (result.code === 0) {
@@ -178,15 +172,26 @@
                                     this.$message.error(result.msg);
                                 }
                             })
-                            .catch((err) => {
-                                console.log(err);
-                            });
                     } else {
                         return false;
                     }
                 });
-                this.putMsgFormVisible = false
+                this.editMsgFormVisible = false
             },
+            doDeleteMsg() {
+                this.$http.delete('/api/message', {data: this.msg})
+                    .then((res) => {
+                        const result = res.data;
+                        if (result.code === 0) {
+                            this.$message.success(result.msg);
+                            // 刷新留言板数据
+                            this.init();
+                        } else {
+                            this.$message.error(result.msg);
+                        }
+                    })
+                this.deleteMsgFormVisible = false
+            }
         },
     }
 </script>
@@ -194,19 +199,12 @@
 <style scoped>
     .container {
         height: 100%;
-        width: 80%;
         margin: auto;
     }
 
     .msgTable {
         height: 92%;
         width: 100%;
-    }
-
-    .box-card {
-        height: 200px;
-        width: auto;
-        margin: 10px;
     }
 
     .contentArea >>> .el-textarea__inner {
@@ -216,5 +214,9 @@
         width: 100%;
     }
 
-
+</style>
+<style>
+    .el-tooltip__popper {
+        max-width: 600px;
+    }
 </style>
