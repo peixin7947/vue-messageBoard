@@ -58,6 +58,9 @@
                         </span>
                         <el-divider></el-divider>
                         <div style="float: bottom">
+                            <el-button style="float: right;margin-left: 30px;" icon="el-icon-edit" type="primary"
+                                       @click="passwordFormVisible = true">修改密码
+                            </el-button>
                             <el-button style="float: right" icon="el-icon-edit" type="primary"
                                        @click="informationFormVisible = true">修改信息
                             </el-button>
@@ -109,6 +112,26 @@
                         <el-button @click="informationFormVisible = false">取 消</el-button>
                     </div>
                 </el-dialog>
+                <el-dialog :close-on-click-modal="false"  title="修改密码" :visible.sync="passwordFormVisible">
+                    <el-form :model="informationForm" status-icon :rules="rules" ref="putPasswordForm">
+                        <el-form-item label="旧密码" label-width="20%" prop="oldPassword">
+                            <el-input class="informationTxt" type="password" v-model="informationForm.oldPassword">
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="新密码" label-width="20%" prop="password">
+                            <el-input class="informationTxt" type="password" v-model="informationForm.password">
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="再次输入密码" label-width="20%" prop="rePassword">
+                            <el-input class="informationTxt" type="password" v-model="informationForm.rePassword">
+                            </el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button type="primary" @click="putInformation('putPasswordForm')">修改</el-button>
+                        <el-button @click="passwordFormVisible = false">取 消</el-button>
+                    </div>
+                </el-dialog>
             </el-main>
         </el-container>
     </el-container>
@@ -126,7 +149,14 @@
             this.init();
         },
         data() {
+            const validateRePassword = (rule, value, callback) => {
+                if (this.informationForm.password !== this.informationForm.rePassword) {
+                    callback(new Error('两次输入的密码不一样'));
+                }
+                callback();
+            };
             return {
+                passwordFormVisible:false,
                 information: this.information,
                 informationForm: this.informationForm,
                 rules: {
@@ -153,7 +183,21 @@
                     ],
                     password: [
                         {required: true, message: '请输入密码', trigger: 'blur'},
+                        {
+                            min: 6, max: 24, message: '密码必须在6-24个字符之间', trigger: 'blur',
+                        },
                         {validator: validatePassword, trigger: 'blur'},
+                    ],
+                    oldPassword: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {
+                            min: 6, max: 24, message: '密码必须在6-24个字符之间', trigger: 'blur',
+                        },
+                        {validator: validatePassword, trigger: 'blur'},
+                    ],
+                    rePassword: [
+                        {required: true, message: '请再次输入密码', trigger: 'blur'},
+                        {validator: validateRePassword, trigger: 'blur'},
                     ],
                 },
                 informationFormVisible: false,
@@ -176,7 +220,6 @@
                             intro: this.information.intro,
                             age: this.information.age,
                         };
-                        console.log(this.information)
                     });
 
             },

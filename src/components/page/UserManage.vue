@@ -6,7 +6,7 @@
         <el-container>
             <!-- 主窗口 -->
             <el-main>
-                <el-tabs>
+                <el-tabs value="first" >
                     <el-tab-pane label="我的留言" name="first">
                         <v-message></v-message>
                     </el-tab-pane>

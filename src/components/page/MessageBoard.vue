@@ -11,7 +11,10 @@
                         <template slot-scope="scope">
                             <img :src="'http://localhost:7001'+ (scope.row.creator ? scope.row.creator.avatar: null)"
                                  width="40" height="40"/>
-                            {{scope.row.creator ? scope.row.creator.nickname: null}}
+                            <el-button type="text"
+                                       @click="getUserInfoById(scope.row.creator._id),informationFormVisible = true">
+                                {{scope.row.creator ? scope.row.creator.nickname: null}}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column label="类型" width="120">
@@ -82,6 +85,42 @@
                     <el-button @click="putMsgFormVisible = false">取 消</el-button>
                 </div>
             </el-dialog>
+            <el-dialog :close-on-click-modal="false" v-if="informationForm" :title="this.informationForm._id === this.userInfo._id?'我的信息':'他人信息'"
+                       :visible.sync="informationFormVisible">
+                <div class="information">
+                    <label style="width: 200px">名称：</label>
+                    <span style="width: 90%;float: right">
+                            {{informationForm.nickname}}
+                        </span>
+                    <el-divider></el-divider>
+                    <div style="display:flex;height: 100px;">
+                        <label style="width: 10%">头像：</label>
+                        <el-image
+                                style="height:100px;width:100px;float: left;"
+                                :src="this.$url + informationForm.avatar"
+                                fit="fit"></el-image>
+                    </div>
+                    <el-divider></el-divider>
+                    <label style="width: 200px">性别：</label>
+                    <span style="width: 90%;float: right" v-if="informationForm.sex === 0">女</span>
+                    <span style="width: 90%;float: right" v-if="informationForm.sex === 1">男</span>
+                    <el-divider></el-divider>
+                    <label style="width: 200px">年龄：</label>
+                    <span v-if="informationForm.age!==0" style="width: 90%;float: right">
+                            {{informationForm.age}}
+                        </span>
+                    <span v-if="informationForm.age===0" style="width: 90%;float: right">
+                            暂无
+                        </span>
+                    <el-divider></el-divider>
+                    <label style="width: 200px">自我介绍：</label>
+                    <span style="width: 90%;float: right">
+                            {{informationForm.intro}}
+                        </span>
+                    <el-divider></el-divider>
+                </div>
+
+            </el-dialog>
         </el-container>
     </el-container>
 </template>
@@ -95,16 +134,19 @@
         name: "MessageBoard",
         created() {
             this.init();
+            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
         },
         data() {
             return {
-                remnant:0,
+                remnant: 0,
+                informationFormVisible: false,
                 putMsgFormVisible: false,
                 items: this.items,
                 total: this.total,
                 pageSizes: this.pageSizes,
                 pageSize: 10,
                 pageIndex: 1,
+                informationForm: {},
                 options: [{
                     value: '问答',
                     label: '问答'
@@ -135,7 +177,13 @@
             vTalk,
         },
         methods: {
-            commentInput(){
+            getUserInfoById(id) {
+                this.$http.get('/api/information/' + id)
+                    .then((res) => {
+                        this.informationForm = res.data.data;
+                    });
+            },
+            commentInput() {
                 this.remnant = this.messageForm.content.length;
             },
             init: function () {

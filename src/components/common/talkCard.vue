@@ -3,7 +3,7 @@
         <div slot="header" class="">
             <span>无人回复的话题</span>
         </div>
-        <div  style="height: 60px" v-for="item in items" :key="item">
+        <div  style="height: 60px" v-for="(item,index) in items" :key="index">
             <router-link :to="{ path: '/messageDetail', query: { messageId: item._id }}">
                 {{item.title}}
             </router-link>

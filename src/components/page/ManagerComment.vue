@@ -36,21 +36,8 @@
                     <el-button @click="deleteMsgFormVisible = false, this.msg = null">取 消</el-button>
                 </div>
             </el-dialog>
-            <el-dialog :close-on-click-modal="false" title="编辑留言" :visible.sync="editMsgFormVisible">
+            <el-dialog :close-on-click-modal="false" title="编辑评论" :visible.sync="editMsgFormVisible">
                 <el-form v-if="msg" :model="msg" status-icon :rules="rules" ref="putMsgForm">
-                    <el-form-item label="标题" label-width="60px" prop="title">
-                        <el-input v-model="msg.title" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="标签" label-width="60px" prop="title">
-                        <el-select v-model="msg.tag" placeholder="请选择标签">
-                            <el-option
-                                    v-for="item in options"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
                     <el-form-item label="内容" label-width="60px" prop="content">
                         <el-input class="contentArea" type="textarea" maxlength="1024" @input="commentInput"
                                   v-model="msg.content"></el-input>
@@ -85,13 +72,6 @@
                 pageSize: 10,
                 pageIndex: 1,
                 msg: null,
-                options: [{
-                    value: '问答',
-                    label: '问答'
-                }, {
-                    value: '分享',
-                    label: '分享'
-                },],
                 messageForm: {
                     title: null,
                     content: null,
