@@ -67,7 +67,8 @@
                         </div>
                     </div>
                 </el-card>
-                <el-dialog :close-on-click-modal="false" v-if="informationForm" title="修改个人信息" :visible.sync="informationFormVisible">
+                <el-dialog :close-on-click-modal="false" v-if="informationForm" title="修改个人信息"
+                           :visible.sync="informationFormVisible">
                     <el-form :model="informationForm" status-icon :rules="rules" ref="putInformationForm">
                         <el-form-item label="名称" label-width="20%" prop="nickname">
                             <el-input class="informationTxt" type="text" v-model="informationForm.nickname">
@@ -77,10 +78,10 @@
                         <el-form-item label="头像" label-width="20%" prop="avatar">
                             <el-upload
                                     class="avatar-uploader"
-                                    action="/api/avatar/upload"
+                                    action=""
                                     :show-file-list="false"
                                     :on-success="handleAvatarSuccess"
-                                    :before-upload="beforeAvatarUpload">
+                                    :before-upload="beforeUpload">
                                 <img v-if="informationForm.avatar" :src="this.$url+information.avatar" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
@@ -108,11 +109,11 @@
                         </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
-                        <el-button type="primary" @click="putInformation('putInformationForm')">发 布</el-button>
+                        <el-button type="primary" @click="putInformation('putInformationForm')">修 改</el-button>
                         <el-button @click="informationFormVisible = false">取 消</el-button>
                     </div>
                 </el-dialog>
-                <el-dialog :close-on-click-modal="false"  title="修改密码" :visible.sync="passwordFormVisible">
+                <el-dialog :close-on-click-modal="false" title="修改密码" :visible.sync="passwordFormVisible">
                     <el-form :model="informationForm" status-icon :rules="rules" ref="putPasswordForm">
                         <el-form-item label="旧密码" label-width="20%" prop="oldPassword">
                             <el-input class="informationTxt" type="password" v-model="informationForm.oldPassword">
@@ -156,7 +157,7 @@
                 callback();
             };
             return {
-                passwordFormVisible:false,
+                passwordFormVisible: false,
                 information: this.information,
                 informationForm: this.informationForm,
                 rules: {
@@ -175,7 +176,7 @@
                         {required: true, message: '请选中你的性别', trigger: 'blur'},
                     ],
                     age: [
-                         {
+                        {
                             pattern: /^(0|[1-9]\d?|120)$/,
                             message: '年龄范围在0-120',
                             trigger: 'blur'
@@ -207,6 +208,28 @@
             vHead,
         },
         methods: {
+            beforeUpload(file) {
+                let fd = new FormData();//通过form数据格式来传
+                fd.append("picFile", file); //传文件
+                this.$http
+                    .post('/api/avatar/upload', fd)
+                    .then(res => {
+                        console.log(res.data);
+                        let data = res.data;
+                        if (data.code == 0) {
+                            this.$message({
+                                message: "上传成功",
+                                type: "success"
+                            });
+                            this.informationForm.avatar = data.data.url;
+                        } else {
+                            this.$message.error(data.msg);
+                        }
+                    })
+                    .catch(error => {
+                        // console.log(error);
+                    });
+            },
             init() {
                 this.$http.get('/api/information/')
                     .then((res) => {
