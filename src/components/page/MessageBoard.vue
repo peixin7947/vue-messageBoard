@@ -7,9 +7,10 @@
             <!-- 留言主窗口 -->
             <el-main v-if="items">
                 <el-table :data="items" stripe :show-header="false" class="msgTable">
-                    <el-table-column  label="用户" width="120">
+                    <el-table-column label="用户" width="120">
                         <template slot-scope="scope">
-                            <img :src="'http://localhost:7001'+ (scope.row.creator ? scope.row.creator.avatar: null)" width="40" height="40"/>
+                            <img :src="'http://localhost:7001'+ (scope.row.creator ? scope.row.creator.avatar: null)"
+                                 width="40" height="40"/>
                             {{scope.row.creator ? scope.row.creator.nickname: null}}
                         </template>
                     </el-table-column>
@@ -34,8 +35,8 @@
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
-                            :current-page="4"
-                            :page-sizes="[10, 20, 30, 40]"
+                            :current-page="1"
+                            :page-sizes="[10,20,50]"
                             :page-size="10"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
@@ -61,7 +62,7 @@
                     <el-form-item label="标题" label-width="60px" prop="title">
                         <el-input v-model="messageForm.title" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="标签" label-width="60px" prop="title">
+                    <el-form-item label="标签" label-width="60px">
                         <el-select v-model="messageForm.tag" placeholder="请选择标签">
                             <el-option
                                     v-for="item in options"
@@ -72,7 +73,9 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="内容" label-width="60px" prop="content">
-                        <el-input class="contentArea" type="textarea" v-model="messageForm.content"></el-input>
+                        <el-input class="contentArea" maxlength="1024" type="textarea" @input="commentInput"
+                                  v-model="messageForm.content"></el-input>
+                        <span style="float: right;">{{remnant}}/1024</span>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -96,9 +99,13 @@
         },
         data() {
             return {
+                remnant:0,
                 putMsgFormVisible: false,
                 items: this.items,
                 total: this.total,
+                pageSizes: this.pageSizes,
+                pageSize: 10,
+                pageIndex: 1,
                 options: [{
                     value: '问答',
                     label: '问答'
@@ -129,8 +136,11 @@
             vTalk,
         },
         methods: {
+            commentInput(){
+                this.remnant = this.messageForm.content.length;
+            },
             init: function () {
-                this.$http.get('/api/message')
+                this.$http.get('/api/message?pageSize=' + this.pageSize + '&pageIndex=' + this.pageIndex)
                     .then((res) => {
                         const data = res.data.data;
                         this.items = data.items;
@@ -145,16 +155,17 @@
                 return moment(date).format("YYYY-MM-DD");
             },
             handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+                this.pageSize = val;
+                this.init();
             },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.pageIndex = val;
+                this.init();
             },
             putMessage(formName) {
                 const that = this;
                 that.$refs[formName].validate((valid) => {
                     if (valid) {
-                        // this.messageForm.content = this.messageForm.content.replace(/\n/gi,"<br/>");
                         this.$http.post('/api/message', this.messageForm)
                             .then((res) => {
                                 const result = res.data;

@@ -37,8 +37,8 @@
                     <el-pagination
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
-                            :current-page="4"
-                            :page-sizes="[10, 20, 30, 40]"
+                            :current-page="1"
+                            :page-sizes="[10,20,50]"
                             :page-size="10"
                             layout="total, sizes, prev, pager, next, jumper"
                             :total="total">
@@ -50,7 +50,7 @@
                 <h1>确认删除该留言？</h1>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="doDeleteMsg()">确定</el-button>
-                    <el-button @click="deleteMsgFormVisible = false; this.msg = null">取 消</el-button>
+                    <el-button @click="deleteMsgFormVisible = false, this.msg = null">取 消</el-button>
                 </div>
             </el-dialog>
             <el-dialog :close-on-click-modal="false" title="编辑留言" :visible.sync="editMsgFormVisible">
@@ -69,12 +69,14 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="内容" label-width="60px" prop="content">
-                        <el-input class="contentArea" type="textarea" v-model="msg.content"></el-input>
+                        <el-input class="contentArea" type="textarea" maxlength="1024" @input="commentInput"
+                                  v-model="msg.content"></el-input>
+                        <span style="float: right;">{{remnant}}/1024</span>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                     <el-button type="primary" @click="putMsg('putMsgForm')">修 改</el-button>
-                    <el-button @click="editMsgFormVisible = false;">取 消</el-button>
+                    <el-button @click="editMsgFormVisible = false">取 消</el-button>
                 </div>
             </el-dialog>
         </el-container>
@@ -93,10 +95,13 @@
         },
         data() {
             return {
+                remnant: 0,
                 editMsgFormVisible: false,
                 deleteMsgFormVisible: false,
                 items: this.items,
                 total: this.total,
+                pageSize: 10,
+                pageIndex: 1,
                 msg: null,
                 options: [{
                     value: '问答',
@@ -127,8 +132,15 @@
             vHead,
         },
         methods: {
+            commentInput() {
+                this.remnant = this.msg.content.length;
+            },
             init: function () {
-                this.$http.get(('/api/user/message/' + this.userInfo._id))
+                if (!this.pageIndex) {
+                    this.pageIndex = 1;
+                    this.pageSize = 10;
+                }
+                this.$http.get(('/api/user/message/' + this.userInfo._id + "?pageIndex=" + this.pageIndex + "&pageSize=" + this.pageSize))
                     .then((res) => {
                         const data = res.data.data;
                         this.items = data.items;
@@ -143,10 +155,12 @@
                 return moment(date).format("YYYY-MM-DD");
             },
             handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+                this.pageSize = val;
+                this.init();
             },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.pageIndex = val;
+                this.init();
             },
             deleteMsg(row) {
                 this.deleteMsgFormVisible = true;
@@ -161,7 +175,9 @@
                     title: this.items[row].title,
                     content: this.items[row].content,
                     tag: this.items[row].tag,
-                }
+                };
+                this.remnant =  this.items[row].content.length;
+
             },
             putMsg(formName) {
                 this.$refs[formName].validate((valid) => {

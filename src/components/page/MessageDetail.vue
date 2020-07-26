@@ -15,7 +15,8 @@
                             </div>
                             <div class="msgInfo">
                             <span style="font-size: 12px; padding-left: 5px">
-                                创建者{{message.creator.nickname}} 于 {{dateFormat(message.createTime)}} 发布·<span v-if="message.updateTime">更新于 {{dateFormat(message.updateTime)}}</span>
+                                创建者{{message.creator.nickname}} 于 {{dateFormat(message.createTime)}} 发布·<span
+                                    v-if="message.updateTime">更新于 {{dateFormat(message.updateTime)}}</span>
                             </span>
                             </div>
                         </div>
@@ -36,23 +37,46 @@
                                 <span v-if="comment.creator" style="font-size: 12px;margin: 5px;display: block;">
                                     创建者 {{comment.creator.nickname}} 于 {{dateFormat(comment.createTime)}} 评论
                                 </span>
-<!--                                <div style="background-color: #f3e7e9;white-space: pre-wrap;">-->
-<!--                                    <span style="word-wrap:break-word;font-size:14px;">{{comment.content}}</span>-->
-<!--                                </div>-->
+
                                 <div style="float: right;">
-                                    <el-button v-if="userInfo._id !== comment.creator._id" @click="onPutReply(index)">
+                                    <el-button size="mini" @click="onPutReply(index)">
                                         回复
                                     </el-button>
-                                    <el-button v-if="userInfo._id === comment.creator._id" @click="onEditReply(index)">
+                                    <el-button v-if="userInfo._id === comment.creator._id" size="mini"
+                                               @click="onEditReply(index)">
                                         编辑
                                     </el-button>
-                                    <el-button v-if="userInfo._id === comment.creator._id" @click="onDeleteReply(index)">
+                                    <el-button v-if="userInfo._id === comment.creator._id" size="mini"
+                                               @click="onDeleteReply(index)">
                                         删除
                                     </el-button>
                                 </div>
                             </div>
                             <div style="display: block;height: auto;">
-                                <span class="replyContent">{{ comment.content }}</span>
+                                <div style="padding-bottom: 20px">
+                                    <span class="replyContent">{{ comment.content }}</span>
+                                </div>
+                                <div style="padding:20px;background-color: #f3e7e9;white-space: pre-wrap;word-wrap:break-word;"
+                                     v-for="(reply, index1) in comment.reply" v-bind:key="index1">
+                                    <span v-if="reply.creator" style="font-size: 12px;display: block;">
+                                    {{reply.creator.nickname}} 于 {{dateFormat(reply.createTime)}} 回复 {{reply.toUser.nickname}}
+                                    </span>
+                                    <span style="font-size:14px;">{{reply.content}}</span>
+                                    <div style="float: right;">
+                                        <el-button size="mini" @click="onPutReply(index,index1)">
+                                            回复
+                                        </el-button>
+                                        <el-button v-if="userInfo._id === reply.creator._id" size="mini"
+                                                   @click="onEditReply(index,index1)">
+                                            编辑
+                                        </el-button>
+                                        <el-button v-if="userInfo._id === reply.creator._id" size="mini"
+                                                   @click="onDeleteReply(index,index1)">
+                                            删除
+                                        </el-button>
+                                    </div>
+                                    <el-divider></el-divider>
+                                </div>
                             </div>
                             <el-divider></el-divider>
                         </div>
@@ -64,7 +88,7 @@
             <h1>确认删除该留言？</h1>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="deleteReply()">确定</el-button>
-                <el-button @click="deleteReplyFormVisible = false;">取 消</el-button>
+                <el-button @click="deleteReplyFormVisible = false">取 消</el-button>
             </div>
         </el-dialog>
         <el-dialog :close-on-click-modal="false" title="编辑评论" :visible.sync="editReplyFormVisible">
@@ -75,7 +99,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="editReply('editReplyForm')">修 改</el-button>
-                <el-button @click="editReplyFormVisible = false;">取 消</el-button>
+                <el-button @click="editReplyFormVisible = false">取 消</el-button>
             </div>
         </el-dialog>
         <el-dialog :close-on-click-modal="false" title="评论留言" :visible.sync="createReplyFormVisible">
@@ -237,13 +261,17 @@
                 this.createReplyFormVisible = false
             },
             // 回复评论
-            onPutReply(index){
+            onPutReply(index, index1) {
                 this.putReplyFormVisible = true;
                 this.form = {
                     messageId: this.message._id,
-                    toUser: this.message.reply[index].creator._id,
-                    commentId:this.message.reply[index]._id
+                    commentId: this.message.comments[index]._id,
                 };
+                if (index1) {
+                    this.form.toUser= this.message.comments[index].reply[index1].creator._id;
+                } else {
+                    this.form.toUser = this.message.comments[index].creator._id;
+                }
             },
             putReply(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -291,7 +319,7 @@
     .replyContent {
         font-size: 14px;
         width: 90%;
-        word-wrap:break-word;
+        word-wrap: break-word;
         white-space: pre-wrap;
     }
 

@@ -39,6 +39,14 @@
                         <span style="width: 90%;float: right" v-if="information.sex === 0">女</span>
                         <span style="width: 90%;float: right" v-if="information.sex === 1">男</span>
                         <el-divider></el-divider>
+                        <label style="width: 200px">年龄：</label>
+                        <span v-if="information.age!==0" style="width: 90%;float: right">
+                            {{information.age}}
+                        </span>
+                        <span v-if="information.age===0" style="width: 90%;float: right">
+                            暂无
+                        </span>
+                        <el-divider></el-divider>
                         <label style="width: 200px">自我介绍：</label>
                         <span style="width: 90%;float: right">
                             {{information.intro}}
@@ -56,7 +64,7 @@
                         </div>
                     </div>
                 </el-card>
-                <el-dialog v-if="informationForm" title="修改个人信息" :visible.sync="informationFormVisible">
+                <el-dialog :close-on-click-modal="false" v-if="informationForm" title="修改个人信息" :visible.sync="informationFormVisible">
                     <el-form :model="informationForm" status-icon :rules="rules" ref="putInformationForm">
                         <el-form-item label="名称" label-width="20%" prop="nickname">
                             <el-input class="informationTxt" type="text" v-model="informationForm.nickname">
@@ -85,9 +93,15 @@
                                 <el-option key="0" label="女" :value="0"></el-option>
                             </el-select>
                         </el-form-item>
-
+                        <el-form-item label="年龄" label-width="20%" prop="age">
+                            <el-input class="informationTxt" type="number" v-model="informationForm.age">
+                                {{information.age}}
+                            </el-input>
+                        </el-form-item>
                         <el-form-item label="自我介绍" label-width="20%" prop="intro">
-                            <el-input class="informationTxt" type="textarea" v-model="informationForm.intro">{{information.intro}}</el-input>
+                            <el-input class="informationTxt" type="textarea" v-model="informationForm.intro">
+                                {{information.intro}}
+                            </el-input>
                         </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
@@ -129,6 +143,13 @@
                     ],
                     sex: [
                         {required: true, message: '请选中你的性别', trigger: 'blur'},
+                    ],
+                    age: [
+                         {
+                            pattern: /^(0|[1-9]\d?|120)$/,
+                            message: '年龄范围在0-120',
+                            trigger: 'blur'
+                        }
                     ],
                     password: [
                         {required: true, message: '请输入密码', trigger: 'blur'},
@@ -242,9 +263,11 @@
         position: relative;
         overflow: hidden;
     }
+
     .avatar-uploader .el-upload:hover {
         border-color: #409EFF;
     }
+
     .avatar-uploader-icon {
         font-size: 28px;
         color: #8c939d;
@@ -253,6 +276,7 @@
         line-height: 178px;
         text-align: center;
     }
+
     .avatar {
         width: 100px;
         height: 100px;
