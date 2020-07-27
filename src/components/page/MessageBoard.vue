@@ -68,7 +68,7 @@
                     <el-form-item label="标题" label-width="60px" prop="title">
                         <el-input v-model="messageForm.title" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="标签" label-width="60px">
+                    <el-form-item label="标签" label-width="60px" prop="tag">
                         <el-select v-model="messageForm.tag" placeholder="请选择标签">
                             <el-option
                                     v-for="item in options"
@@ -167,7 +167,7 @@
                 },
                 rules: {
                     title: [
-                        {required: true, message: '标题', trigger: 'blur'},
+                        {required: true, message: '标题不能为空', trigger: 'blur'},
                         {
                             min: 3, max: 30, message: '标题必须在3-30个字符之间', trigger: 'blur',
                         },
@@ -175,6 +175,9 @@
                     content: [
                         {required: true, message: '请输入留言', trigger: 'blur'},
                     ],
+                    tag: [
+                        {required: true, message: '标签不能为空', trigger: 'blur'},
+                    ]
                 },
             };
         },
@@ -236,6 +239,7 @@
                                 console.log(err);
                             });
                     } else {
+                        this.$message.error('数据错误');
                         return false;
                     }
                 });

@@ -8,7 +8,7 @@
             <el-main v-if="information">
                 <el-card :data="information" class="informationCard">
                     <div slot="header">
-                        <span style="font-size: 36px; padding-left: 10px">个人信息</span>
+                        <span style="font-size: 30px; padding-left: 10px">个人信息</span>
                     </div>
                     <div class="information">
                         <label style="width: 600px">用户名：</label>
@@ -262,9 +262,13 @@
                                 const result = res.data;
                                 if (result.code === 0) {
                                     this.$message.success(result.msg);
+                                    if (this.informationForm.password) {
+                                        this.$router.push('/');
+                                        localStorage.clear();
+                                    }
                                     // 刷新留言板数据
                                     this.init();
-                                    // 清空写留言的内容
+                                    // 清空内容
                                     this.$refs[formName].resetFields();
                                 } else {
                                     this.$message.error(result.msg);
@@ -305,7 +309,7 @@
     }
 
     .informationCard {
-        height: 92%;
+        height: 98%;
         width: 100%;
     }
 

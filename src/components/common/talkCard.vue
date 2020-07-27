@@ -1,16 +1,22 @@
 <template>
-    <el-card class="talk-card"  >
+    <el-card class="talk-card">
         <div slot="header" class="">
             <span>无人回复的话题</span>
         </div>
-        <div  style="height: 100px" v-for="(item,index) in items" :key="index">
-            <div style="display: block">
-                <router-link :to="{ path: '/messageDetail', query: { messageId: item._id }}">
-                    {{item.title}}
-                </router-link>
+
+        <div v-for="(item,index) in items" :key="index">
+            <div>
+                <div style="display: block">
+                    <router-link :to="{ path: '/messageDetail', query: { messageId: item._id }}">
+                        {{item.title}}
+                    </router-link>
+                </div>
+                <div style="display: block">
+                    <el-tag>{{item.tag}}</el-tag>
+                    <span style="float: right">发布于{{dateFormat(item.createTime)}}</span>
+                    <!--                <el-divider></el-divider>-->
+                </div>
             </div>
-            <el-tag>{{item.tag}}</el-tag>
-            <span style="float: right">发布于{{dateFormat(item.createTime)}}</span>
             <el-divider></el-divider>
         </div>
     </el-card>
@@ -46,7 +52,6 @@
 
 <style scoped>
     .talk-card {
-        height: 560px;
         width: auto;
         margin: 10px;
     }
