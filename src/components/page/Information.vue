@@ -78,11 +78,12 @@
                         <el-form-item label="头像" label-width="20%" prop="avatar">
                             <el-upload
                                     class="avatar-uploader"
-                                    action=""
+                                    action="/api/time"
                                     :show-file-list="false"
                                     :on-success="handleAvatarSuccess"
-                                    :before-upload="beforeUpload">
-                                <img v-if="informationForm.avatar" :src="this.$url+information.avatar" class="avatar">
+                                    :before-upload="beforeUpload"
+                                    >
+                                <img v-if="informationForm.avatar" :src="information.avatar" class="avatar">
                                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                             </el-upload>
                         </el-form-item>
@@ -211,23 +212,23 @@
             beforeUpload(file) {
                 let fd = new FormData();//通过form数据格式来传
                 fd.append("picFile", file); //传文件
-                this.$http
-                    .post('/api/avatar/upload', fd)
+                this.$http.post('/api/avatar/upload', fd)
                     .then(res => {
                         console.log(res.data);
                         let data = res.data;
-                        if (data.code == 0) {
+                        if (data.code === 0) {
                             this.$message({
                                 message: "上传成功",
                                 type: "success"
                             });
                             this.informationForm.avatar = data.data.url;
+                            this.information.avatar = data.data.url;
                         } else {
                             this.$message.error(data.msg);
                         }
                     })
                     .catch(error => {
-                        // console.log(error);
+                        console.log(error);
                     });
             },
             init() {

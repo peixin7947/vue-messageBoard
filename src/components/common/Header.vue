@@ -31,8 +31,8 @@
             }
         },
         created() {
-            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
-            this.avatar = this.$url + this.userInfo.avatar;
+            this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            this.avatar = this.userInfo.avatar;
         },
 
         methods: {

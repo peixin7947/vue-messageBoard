@@ -77,6 +77,12 @@ const router = new Router({
   ],
 });
 router.beforeEach((to, from, next) => { // beforeEach是router的钩子函数，在进入路由前执行
+  if (to.path !== '/'){
+    const userInfo = window.localStorage.getItem('userInfo');
+    if (!userInfo) {
+      next('/')
+    }
+  }
   if (to.meta.title) { // 判断是否有标题
     document.title = to.meta.title;
   }

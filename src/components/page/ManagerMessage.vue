@@ -1,8 +1,9 @@
 <template>
-    <el-container style="height: 1000px">
+    <el-container style="height: 800px">
         <el-container v-if="items">
             <!-- 留言主窗口 -->
             <el-main>
+                <el-scrollbar class="el-scrollbar">
                 <el-table :data="items" type=index stripe class="msgTable">
                     <el-table-column label="类型" width="120">
                         <template slot-scope="scope">
@@ -29,6 +30,7 @@
                         </template>
                     </el-table-column>
                 </el-table>
+                </el-scrollbar>
                 <!-- 分页 -->
                 <div class="block">
                     <el-pagination
@@ -85,7 +87,7 @@
     export default {
         name: "MessageBoard",
         created() {
-            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
             this.init();
         },
         data() {
@@ -229,9 +231,18 @@
         width: 100%;
     }
 
+    .el-scrollbar {
+        height: 92%;
+    }
+
+    .el-scrollbar >>> .el-scrollbar__wrap {
+        overflow-x: hidden;
+    }
+
 </style>
 <style>
     .el-tooltip__popper {
         max-width: 600px;
     }
+
 </style>

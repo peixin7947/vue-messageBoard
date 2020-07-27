@@ -138,7 +138,7 @@
         name: "MessageDetail",
         created() {
             this.init();
-            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
         },
 
         data() {
@@ -170,6 +170,11 @@
             init() {
                 this.$http.get('/api/message/' + this.$route.query.messageId)
                     .then((res) => {
+                        console.log(res)
+                        if (res.data.status === 1) {
+                            this.$message.error(res.data.msg);
+                            this.$router.go(-1);
+                        }
                         const data = res.data;
                         this.message = data.data;
                     });
@@ -324,15 +329,15 @@
         white-space: pre-wrap;
     }
 
-    .el-scrollbar {
-        height: 92%;
-    }
-
     .contentArea >>> .el-textarea__inner {
         resize: none;
         max-height: 800px;
         height: 400px;
         width: 100%;
+    }
+
+    .el-scrollbar {
+        height: 92%;
     }
 
     .el-scrollbar >>> .el-scrollbar__wrap {

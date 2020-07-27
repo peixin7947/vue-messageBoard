@@ -5,7 +5,7 @@
         </el-header>
         <el-container>
             <!-- 留言主窗口 -->
-            <el-main v-if="items">
+            <el-main v-if="items" style="height: 100%">
                 <el-input placeholder="搜索关键字" v-model="keyword" class="searchClass">
                     <el-button slot="append" icon="el-icon-search" @click="init(keyword)"></el-button>
                 </el-input>
@@ -13,7 +13,7 @@
                 <el-table :data="items" stripe :show-header="false" class="msgTable">
                     <el-table-column label="用户" width="120">
                         <template slot-scope="scope">
-                            <img :src="'http://localhost:7001'+ (scope.row.creator ? scope.row.creator.avatar: null)"
+                            <img :src="(scope.row.creator ? scope.row.creator.avatar: null)"
                                  width="40" height="40"/>
                             <el-button type="text"
                                        @click="getUserInfoById(scope.row.creator._id),informationFormVisible = true">
@@ -89,7 +89,7 @@
                     <el-button @click="putMsgFormVisible = false">取 消</el-button>
                 </div>
             </el-dialog>
-            <el-dialog :close-on-click-modal="false" v-if="informationForm"
+            <el-dialog v-if="informationForm"
                        :title="this.informationForm._id === this.userInfo._id?'我的信息':'他人信息'"
                        :visible.sync="informationFormVisible">
                 <div class="information">
@@ -139,7 +139,7 @@
         name: "MessageBoard",
         created() {
             this.init('');
-            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
         },
         data() {
             return {
@@ -192,7 +192,7 @@
             commentInput() {
                 this.remnant = this.messageForm.content.length;
             },
-            init: function (keyword) {
+            init: function (keyword = '') {
                 this.$http.get('/api/message?keyword=' + keyword + '&pageSize=' + this.pageSize + '&pageIndex=' + this.pageIndex)
                     .then((res) => {
                         const data = res.data.data;
@@ -226,7 +226,7 @@
                                     this.$message.success(result.msg);
                                     // 刷新留言板数据
                                     this.init();
-                                    // 情况写留言的内容
+                                    // 清空写留言的内容
                                     this.$refs[formName].resetFields();
                                 } else {
                                     this.$message.error(result.msg);
@@ -253,7 +253,7 @@
     }
 
     .msgTable {
-        height: 92%;
+        height: 90%;
         width: 100%;
     }
 
@@ -270,54 +270,8 @@
         width: 100%;
     }
 
-
     .searchClass{
         width: 400px;
-        border: 1px solid #c5c5c5;
-        border-radius: 20px;
-        background: #f4f4f4;
-    }
-    .searchClass .el-input-group__prepend {
-        border: none;
-        background-color: transparent;
-        padding: 0 10px 0 30px;
-    }
-    .searchClass .el-input-group__append {
-        border: none;
-        background-color: transparent;
-    }
-    .searchClass .el-input__inner {
-        height: 36px;
-        line-height: 36px;
-        border: none;
-        background-color: transparent;
-    }
-    .searchClass .el-icon-search{
-        font-size: 16px;
-    }
-    .searchClass .centerClass {
-        height: 100%;
-        line-height: 100%;
-        display: inline-block;
-        vertical-align: middle;
-        text-align: right;
-    }
-    .searchClass .line {
-        width: 1px;
-        height: 26px;
-        background-color: #c5c5c5;
-        margin-left: 14px;
-    }
-    .searchClass:hover{
-        border: 1px solid #D5E3E8;
-        background: #fff;
-    }
-    .searchClass:hover .line {
-        background-color: #D5E3E8;
-    }
-    .searchClass:hover .el-icon-search {
-        color: #409eff;
-        font-size: 16px;
     }
 
 </style>

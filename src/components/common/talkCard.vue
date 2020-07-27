@@ -3,10 +3,12 @@
         <div slot="header" class="">
             <span>无人回复的话题</span>
         </div>
-        <div  style="height: 60px" v-for="(item,index) in items" :key="index">
-            <router-link :to="{ path: '/messageDetail', query: { messageId: item._id }}">
-                {{item.title}}
-            </router-link>
+        <div  style="height: 100px" v-for="(item,index) in items" :key="index">
+            <div style="display: block">
+                <router-link :to="{ path: '/messageDetail', query: { messageId: item._id }}">
+                    {{item.title}}
+                </router-link>
+            </div>
             <el-tag>{{item.tag}}</el-tag>
             <span style="float: right">发布于{{dateFormat(item.createTime)}}</span>
             <el-divider></el-divider>
@@ -44,7 +46,7 @@
 
 <style scoped>
     .talk-card {
-        height: 360px;
+        height: 560px;
         width: auto;
         margin: 10px;
     }

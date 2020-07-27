@@ -1,21 +1,28 @@
 <template>
-    <el-container style="height: 1000px">
+    <el-container style="height: 800px">
         <el-container v-if="items">
             <el-main>
+                <el-scrollbar class="el-scrollbar">
                 <el-table :data="items" type=index stripe class="msgTable">
-                    <el-table-column prop="content" style="float: left;" label="内容" width="800" class="contentTooltip"
+                    <el-table-column prop="content" style="float: left;" label="内容" width="1000"
                                      show-overflow-tooltip>
                     </el-table-column>
-                    <el-table-column prop="createTime" type="datetime" :formatter="dateFormat" min-width="40"
+                    <el-table-column prop="createTime" type="datetime" :formatter="dateFormat" width="120"
                                      label="发布日期" fixed="right">
                     </el-table-column>
                     <el-table-column min-width="50" fixed="right" label="操作" style="float: right;">
                         <template slot-scope="scope">
+                            <el-button>
+                                <router-link :to="{ path: '/messageDetail', query: { messageId: scope.row.messageId }}">
+                                    查看详情
+                                </router-link>
+                            </el-button>
                             <el-button @click="editMsg(scope.$index)">编辑</el-button>
                             <el-button @click="deleteMsg(scope.$index)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
+                </el-scrollbar>
                 <!-- 分页 -->
                 <div class="block">
                     <el-pagination
@@ -59,7 +66,7 @@
     export default {
         name: "MessageBoard",
         created() {
-            this.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+            this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
             this.init();
         },
         data() {
@@ -192,6 +199,13 @@
         max-height: 800px;
         height: 400px;
         width: 100%;
+    }
+    .el-scrollbar {
+        height: 92%;
+    }
+
+    .el-scrollbar >>> .el-scrollbar__wrap {
+        overflow-x: hidden;
     }
 
 </style>
